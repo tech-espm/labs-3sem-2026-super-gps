@@ -29,3 +29,30 @@ CREATE TABLE usuario (
 );
 
 INSERT INTO usuario (email, nome, idperfil, token, criacao) VALUES ('admin@espm.br', 'Administrador', 1, NULL, NOW());
+
+-- DROP TABLE IF EXISTS van;
+CREATE TABLE van (
+  id int NOT NULL AUTO_INCREMENT,
+  apelido varchar(100) NOT NULL,
+  placa varchar(15) NOT NULL,
+  modelo varchar(100) NOT NULL,
+  capacidade int NOT NULL,
+  exclusao datetime NULL,
+  criacao datetime NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY van_placa_UN (placa),
+  KEY van_exclusao_IX (exclusao)
+);
+
+-- DROP TABLE IF EXISTS log;
+CREATE TABLE log (
+  id bigint NOT NULL AUTO_INCREMENT,
+  idvan int NOT NULL,
+  latitude float NOT NULL,
+  longitude float NOT NULL,
+  velocidade float NOT NULL,
+  data datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY log_idvan_FK_IX (idvan ASC, data DESC),
+  CONSTRAINT log_idvan_FK FOREIGN KEY (idvan) REFERENCES van (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
