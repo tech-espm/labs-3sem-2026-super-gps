@@ -65,6 +65,7 @@ class VanApiRoute {
 
 		res.sendStatus(204);
 	}
+	
 }
 
 export = VanApiRoute;

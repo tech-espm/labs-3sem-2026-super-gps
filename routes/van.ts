@@ -13,6 +13,7 @@ class VanRoute {
 				textoSubmit: "Criar",
 				usuario: u,
 				item: null
+				
 			});
 	}
 
@@ -51,6 +52,21 @@ class VanRoute {
 				lista: await Van.listar()
 			});
 	}
+	public static async mapa(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u || !u.admin)
+			res.redirect(app.root + "/acesso");
+		else
+			res.render("van/mapa", {
+				layout: "layout-tabela",
+				titulo: "Mapa das Vans",
+				datatables: true,
+				xlsx: true,
+				usuario: u,
+				lista: await Van.listar()
+			});
+	}
+
 }
 
 export = VanRoute;
