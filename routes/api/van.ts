@@ -65,7 +65,10 @@ class VanApiRoute {
 
 		res.sendStatus(204);
 	}
-	
+
+	public static async listarCoordenadas(req: app.Request, res: app.Response) {
+		res.json(await Van.listarCoordenadas());
+	}
 }
 
 export = VanApiRoute;

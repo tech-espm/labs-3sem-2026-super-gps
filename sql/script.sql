@@ -38,6 +38,7 @@ CREATE TABLE van (
   placa varchar(15) NOT NULL,
   modelo varchar(100) NOT NULL,
   capacidade int NOT NULL,
+  senha varchar(45) NULL,
   exclusao datetime NULL,
   criacao datetime NOT NULL,
   PRIMARY KEY (id),

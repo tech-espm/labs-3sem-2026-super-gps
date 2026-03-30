@@ -53,18 +53,10 @@ class VanRoute {
 			});
 	}
 	public static async mapa(req: app.Request, res: app.Response) {
-		let u = await Usuario.cookie(req);
-		if (!u || !u.admin)
-			res.redirect(app.root + "/acesso");
-		else
-			res.render("van/mapa", {
-				layout: "layout-tabela",
-				titulo: "Mapa das Vans",
-				datatables: true,
-				xlsx: true,
-				usuario: u,
-				lista: await Van.listar()
-			});
+		res.render("van/mapa", {
+			layout: "layout-externo-sem-card",
+			titulo: "Mapa das Vans",
+		});
 	}
 
 }

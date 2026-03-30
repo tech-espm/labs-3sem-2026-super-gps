@@ -1,8 +1,85 @@
 
-<div id="map">
-</div>
+<div id="map"></div>
 
+<%- contentFor("styles") %>
 
+<!-- LINK PARA O MAPA -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
+<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+		min-height: 100vh;
+		height: 100vh;
+		max-height: 100vh;
+	}
 
-<script src="<%- staticRoot %>/js/mapa.js"></script>
+	#map {
+		width: 100%;
+		height: 100vh;
+	}
+</style>
+
+<%- contentFor("scripts") %>
+
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+	let map = L.map("map").setView([-23.58708910195492, -46.64438042597288], 17);
+
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 20,
+		attribution: '&copy; OpenStreetMap'
+	}).addTo(map);
+
+	let marker = null;
+	let markerVans = {};
+
+	function pos(position) {
+		let lat = position.coords.latitude;
+		let lon = position.coords.longitude;
+
+		if (!marker) {
+			map.setView([lat, lon]);
+			marker = L.marker([lat, lon]).addTo(map);
+			marker.bindPopup("<b>Olá!</b><br>Sou o super GPS");
+		} else {
+			marker.setLatLng([lat, lon]);
+		}
+
+		setTimeout(function () {
+			navigator.geolocation.getCurrentPosition(pos);
+		}, 10000);
+	}
+
+	navigator.geolocation.getCurrentPosition(pos);
+
+	async function listarCoordenadas() {
+		try {
+			const response = await fetch("<%- root %>/api/van/listarCoordenadas");
+
+			if (response.ok) {
+				const vans = await response.json();
+
+				for (let i = 0; i < vans.length; i++) {
+					const van = vans[i];
+					let markerVan = markerVans[van.id];
+					if (!markerVan) {
+						markerVan = L.marker([van.latitude, van.longitude]).addTo(map);
+						markerVan.bindPopup("<b>Olá!</b><br>Sou a Van " + encode(van.apelido));
+						markerVans[van.id] = marker;
+					} else {
+						markerVan.setLatLng([van.latitude, van.longitude]);
+					}
+				}
+			}
+		} catch (ex) {
+		}
+
+		setTimeout(listarCoordenadas, 5000);
+	}
+
+	listarCoordenadas();
+</script>

@@ -7,6 +7,7 @@ interface Van {
 	placa: string;
 	modelo: string;
 	capacidade: number;
+	senha: string | null;
 	criacao: string;
 }
 
@@ -35,6 +36,11 @@ class Van {
 		if (isNaN(van.capacidade) || van.capacidade <= 0)
 			return "Capacidade inválida";
 
+		if (!van.senha || !(van.senha = van.senha.normalize().trim()))
+			van.senha = null;
+		else if (van.senha.length > 45)
+			return "Senha inválida";
+			
 		return null;
 	}
 
@@ -46,7 +52,7 @@ class Van {
 
 	public static obter(id: number): Promise<Van> {
 		return app.sql.connect(async (sql) => {
-			const lista: Van[] = await sql.query("select id, apelido, placa, modelo, capacidade, date_format(criacao, '%d/%m/%Y') criacao from van where id = ?", [id]);
+			const lista: Van[] = await sql.query("select id, apelido, placa, modelo, capacidade, senha, date_format(criacao, '%d/%m/%Y') criacao from van where id = ?", [id]);
 
 			return ((lista && lista[0]) || null);
 		});
@@ -59,7 +65,7 @@ class Van {
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.query("insert into van (apelido, placa, modelo, capacidade, criacao) values (?, ?, ?, ?, now())", [van.apelido, van.placa, van.modelo, van.capacidade]);
+				await sql.query("insert into van (apelido, placa, modelo, capacidade, senha, criacao) values (?, ?, ?, ?, ?, now())", [van.apelido, van.placa, van.modelo, van.capacidade, van.senha]);
 
 				return null;
 			} catch (e) {
@@ -83,7 +89,7 @@ class Van {
 			return res;
 
 		return app.sql.connect(async (sql) => {
-			await sql.query("update van set apelido = ?, placa = ?, modelo = ?, capacidade = ? where id = ? and exclusao is null", [van.apelido, van.placa, van.modelo, van.capacidade, van.id]);
+			await sql.query("update van set apelido = ?, placa = ?, modelo = ?, capacidade = ?, senha = ? where id = ? and exclusao is null", [van.apelido, van.placa, van.modelo, van.capacidade, van.senha, van.id]);
 
 			return (sql.affectedRows ? null : "Van não encontrada");
 		});
@@ -95,6 +101,36 @@ class Van {
 			await sql.query("update van set placa = concat('@', id, ':', placa), exclusao = ? where id = ? and exclusao is null", [DataUtil.horarioDeBrasiliaISOComHorario(), id]);
 
 			return (sql.affectedRows ? null : "Van não encontrada");
+		});
+	}
+
+	public static async listarCoordenadas(): Promise<any[]> {
+		return app.sql.connect(async (sql) => {
+			const vans: any[] = (await sql.query("select id, apelido, placa, modelo, capacidade from van where exclusao is null")) || [];
+
+			let posicoes: any[] = [];
+
+			const dataLimite = DataUtil.horarioDeBrasiliaISOComHorario(-20 * 60);
+
+			for (let i = 0; i < vans.length; i++) {
+				const van = vans[i];
+
+				const lista: any[] = (await sql.query("select latitude, longitude from log where idvan = ? and data >= ? order by id desc limit 1", [van.id, dataLimite])) || [];
+
+				if (lista.length) {
+					posicoes.push({
+						id: van.id,
+						apelido: van.apelido,
+						placa: van.placa,
+						modelo: van.modelo,
+						capacidade: van.capacidade,
+						latitude: lista[0].latitude,
+						longitude: lista[0].longitude,
+					});
+				}
+			}
+
+			return posicoes;
 		});
 	}
 }
