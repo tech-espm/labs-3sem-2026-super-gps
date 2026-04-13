@@ -1,0 +1,165 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="p-5">
+            <div class="mb-4 text-center">
+                <img style="width: 100%; max-width: 250px;" alt="Logo ESPM" src="<%- staticRoot %>/img/logo.png" />
+            </div>
+
+            <div>
+                <p style="text-align: center; color: #a80532; ">Olá, motorista! Faça login com sua van antes de começar
+                    a rodar.</p>
+            </div>
+            <form method="POST">
+                <div class="form-group row">
+                    <div class="col-sm-12 mb-3 mb-sm-0">
+                        <input type="text" class="form-control" id="inputApelidoVan" placeholder="Apelido da Van">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12 mb-3 mb-sm-0">
+                        <input type="text" class="form-control" id="inputPlacaVan" placeholder="Placa da Van">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <input type="password" class="form-control" id="inputSenhaVan" placeholder="Senha">
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="password" class="form-control" id="inputConfirmaSenhaVan"
+                            placeholder="Repetir Senha">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-user btn-block" onclick="loginMotorista()">
+                    Rodar com a Van
+                </button>
+
+            </form>
+            <hr />
+            <div class="text-center">
+                <a class="small" href="<%- root %>/exemplo/esqueci">Esqueceu a Senha?</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" tabindex="-1" id="popupExecucao">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Localização Ativa!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sua localização esta sendo Compartilhada</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="pararLocalizacao()">
+                    Parar a transmissão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor("scripts") %>
+
+    <script>
+        function mostrarPopup(lat, lng) {
+            document.querySelector("#popupExecucao .modal-body")
+
+
+            let modal = new bootstrap.Modal(document.getElementById('popupExecucao'));
+            modal.show();
+        }
+
+        function loginMotorista() {
+            let apelidoVan = document.getElementById("inputApelidoVan").value;
+            let senhaVan = document.getElementById("inputSenhaVan").value;
+            let confirmaSenhaVan = document.getElementById("inputConfirmaSenhaVan").value;
+            let placaVan = document.getElementById("inputPlacaVan").value.trim().toUpperCase();
+
+            if (!apelidoVan) {
+                alert("O Apelido da van é invalido !")
+                return;
+            }
+            if (!senhaVan) {
+                alert("A senha não pode estar vazia!")
+                return;
+            }
+            if (!confirmaSenhaVan) {
+                alert("A confirmação da senha não pode estar vazia!")
+                return;
+            }
+            if (senhaVan != confirmaSenhaVan) {
+                alert("Ops! As senhas não coincidem.")
+                return;
+            }
+            if (!placaVan) {
+                alert("O campo placa esta vazio.")
+                return;
+            }
+
+            JsonWebApi.post("<%- root %>/api/van/loginMotorista", {
+                apelido: apelidoVan,
+                senha: senhaVan,
+                placa: placaVan
+            }, function (response) {
+
+                if (response.success) {
+
+                    Swal.success("Van encontrada!");
+                    let idVan = response.value.value.id
+                    iniciarLocalizacao(idVan)
+                } else {
+
+                    Swal.error("Van não encontrada!");
+                }
+
+            });
+        }
+
+        let intervaloGPS = null;
+
+        function iniciarLocalizacao(idVan) {
+
+            if (intervaloGPS) return; // evita múltiplos loops
+
+            function capturar() {
+                navigator.geolocation.getCurrentPosition(function (pos) {
+
+                    let latitude = pos.coords.latitude;
+                    let longitude = pos.coords.longitude;
+
+                    console.log(idVan)
+                    console.log(latitude)
+                    console.log(longitude)
+
+                    mostrarPopup(latitude, longitude);
+
+                }, function (erro) {
+                    console.log("Erro ao obter localização:", erro);
+                });
+            }
+
+            capturar();
+            intervaloGPS = setInterval(capturar, 10000);
+        }
+
+        function pararLocalizacao() {
+            if (intervaloGPS) {
+                clearInterval(intervaloGPS);
+                intervaloGPS = null;
+                console.log("Localização parada");
+            }
+
+            let modalEl = document.getElementById('popupExecucao');
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+
+    </script>

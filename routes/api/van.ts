@@ -69,6 +69,23 @@ class VanApiRoute {
 	public static async listarCoordenadas(req: app.Request, res: app.Response) {
 		res.json(await Van.listarCoordenadas());
 	}
+
+	@app.http.post()
+	public static async loginMotorista(req: app.Request, res: app.Response) {
+
+		let apelido = req.body.apelido;
+		let senha = req.body.senha;
+		let placa = req.body.placa;
+
+		let van = await Van.loginMotorista(apelido, senha, placa);
+
+		if (!van) {
+			res.json({ success: false });
+			return;
+		}
+
+		res.json({ success: true, value: van });
+	}
 }
 
 export = VanApiRoute;

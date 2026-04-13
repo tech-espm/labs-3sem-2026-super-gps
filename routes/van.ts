@@ -13,7 +13,7 @@ class VanRoute {
 				textoSubmit: "Criar",
 				usuario: u,
 				item: null
-				
+
 			});
 	}
 
@@ -23,7 +23,7 @@ class VanRoute {
 			res.redirect(app.root + "/acesso");
 		} else {
 			let id = parseInt(req.query["id"] as string);
-			let item: Van = null;
+			let item: Van | null = null; 
 			if (isNaN(id) || !(item = await Van.obter(id)))
 				res.render("index/nao-encontrado", {
 					layout: "layout-sem-form",
@@ -56,6 +56,12 @@ class VanRoute {
 		res.render("van/mapa", {
 			layout: "layout-externo-sem-card",
 			titulo: "Mapa das Vans",
+		});
+	}
+	public static async motorista(req: app.Request, res: app.Response) {
+		res.render("van/motorista", {
+			layout: "layout-externo",
+			titulo: "Login do Motorista",
 		});
 	}
 

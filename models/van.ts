@@ -40,7 +40,7 @@ class Van {
 			van.senha = null;
 		else if (van.senha.length > 45)
 			return "Senha inválida";
-			
+
 		return null;
 	}
 
@@ -131,6 +131,20 @@ class Van {
 			}
 
 			return posicoes;
+		});
+	}
+
+	public static async loginMotorista(apelido: string, senha: string, placa: string): Promise<Van | null> {
+		placa = placa.toUpperCase();
+
+		return app.sql.connect(async (sql) => {
+			console.log(apelido, senha, placa);
+			const lista: Van[] = await sql.query(
+				"select id, apelido, placa, modelo, capacidade, senha, date_format(criacao, '%d/%m/%Y') criacao from van where apelido = ? and senha = ? and placa = ? and exclusao is null",
+				[apelido, senha, placa]
+			);
+
+			return ((lista && lista[0]) || null);
 		});
 	}
 }
