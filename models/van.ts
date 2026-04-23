@@ -105,34 +105,25 @@ class Van {
 	}
 
 	public static async listarCoordenadas(): Promise<any[]> {
-		return app.sql.connect(async (sql) => {
-			const vans: any[] = (await sql.query("select id, apelido, placa, modelo, capacidade from van where exclusao is null")) || [];
+    return app.sql.connect(async (sql) => {
 
-			let posicoes: any[] = [];
+        const lista = await sql.query(`
+            SELECT v.id, v.apelido, v.placa, v.modelo, v.capacidade,
+                   l.latitude, l.longitude
+            FROM van v
+            JOIN log l ON l.idvan = v.id
+            WHERE v.exclusao IS NULL
+              AND l.data >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+              AND l.id = (
+                  SELECT MAX(id)
+                  FROM log
+                  WHERE idvan = v.id
+              )
+        `);
 
-			const dataLimite = DataUtil.horarioDeBrasiliaISOComHorario(-20 * 60);
-
-			for (let i = 0; i < vans.length; i++) {
-				const van = vans[i];
-
-				const lista: any[] = (await sql.query("select latitude, longitude from log where idvan = ? and data >= ? order by id desc limit 1", [van.id, dataLimite])) || [];
-
-				if (lista.length) {
-					posicoes.push({
-						id: van.id,
-						apelido: van.apelido,
-						placa: van.placa,
-						modelo: van.modelo,
-						capacidade: van.capacidade,
-						latitude: lista[0].latitude,
-						longitude: lista[0].longitude,
-					});
-				}
-			}
-
-			return posicoes;
-		});
-	}
+        return lista || [];
+    });
+}
 
 	public static async loginMotorista(apelido: string, senha: string, placa: string): Promise<Van | null> {
 		placa = placa.toUpperCase();
@@ -147,6 +138,18 @@ class Van {
 			return ((lista && lista[0]) || null);
 		});
 	}
-}
+
+
+	public static async salvarLoc(idVan: number, latitude: number, longitude: number): Promise<string> {
+	return app.sql.connect(async (sql) => {
+		await sql.query(
+			"INSERT INTO log (idvan, latitude, longitude, data) VALUES (?, ?, ?, now())",
+			[idVan, latitude, longitude]
+		);
+
+		return null;
+	});
+}}
+
 
 export = Van;

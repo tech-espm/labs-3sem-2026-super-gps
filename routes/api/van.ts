@@ -86,6 +86,30 @@ class VanApiRoute {
 
 		res.json({ success: true, value: van });
 	}
+
+	@app.http.post()
+	public static async salvarLoc(req: app.Request, res: app.Response) {
+
+
+		let idVan = parseInt(req.body.idVan);
+		let latitude = parseFloat(req.body.latitude);
+		let longitude = parseFloat(req.body.longitude);
+
+		if (isNaN(idVan) || isNaN(latitude) || isNaN(longitude)) {
+			res.json({ success: false, error: "Dados inválidos" });
+			return;
+		}
+
+		let erro = await Van.salvarLoc(idVan, latitude, longitude);
+
+		if (erro) {
+			res.json({ success: false, error: erro });
+			return;
+		}
+
+		res.json({ success: true });
+
+	}
 }
 
 export = VanApiRoute;

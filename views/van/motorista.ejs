@@ -6,22 +6,26 @@
             </div>
 
             <div>
-                <p style="text-align: center; color: #a80532; ">Olá, motorista! Faça login com sua van antes de começar
-                    a rodar.</p>
+                <p style="text-align: center; color: #a80532;">
+                    Olá, motorista! Faça login com sua van antes de começar a rodar.
+                </p>
             </div>
+
             <form method="POST">
                 <div class="form-group row">
-                    <div class="col-sm-12 mb-3 mb-sm-0">
+                    <div class="col-sm-12 mb-3">
                         <input type="text" class="form-control" id="inputApelidoVan" placeholder="Apelido da Van">
                     </div>
                 </div>
+
                 <div class="form-group row">
-                    <div class="col-sm-12 mb-3 mb-sm-0">
+                    <div class="col-sm-12 mb-3">
                         <input type="text" class="form-control" id="inputPlacaVan" placeholder="Placa da Van">
                     </div>
                 </div>
+
                 <div class="form-group row">
-                    <div class="col-sm-6 mb-3 mb-sm-0">
+                    <div class="col-sm-6 mb-3">
                         <input type="password" class="form-control" id="inputSenhaVan" placeholder="Senha">
                     </div>
                     <div class="col-sm-6">
@@ -29,137 +33,177 @@
                             placeholder="Repetir Senha">
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary btn-user btn-block" onclick="loginMotorista()">
+
+                <button type="button" class="btn btn-primary btn-block" onclick="loginMotorista()">
                     Rodar com a Van
                 </button>
-
             </form>
+
             <hr />
+
             <div class="text-center">
                 <a class="small" href="<%- root %>/exemplo/esqueci">Esqueceu a Senha?</a>
             </div>
-
         </div>
     </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal fade" id="exampleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
 
-<div class="modal" tabindex="-1" id="popupExecucao">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Localização Ativa!</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5 w-100">Localização Ativa!</h1>
             </div>
+
             <div class="modal-body">
-                <p>Sua localização esta sendo Compartilhada</p>
+                <p id="textoLocalizacao">Sua localização está sendo compartilhada</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="pararLocalizacao()">
+
+            <div class="modal-footer justify-content-center border-top-0">
+                <button id="btnPararTransmissao" type="button" class="btn btn-danger" onclick="pararLocalizacao()"
+                    data-bs-dismiss="modal">
                     Parar a transmissão
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<%- contentFor("scripts") %>
-
-    <script>
-        function mostrarPopup(lat, lng) {
-            document.querySelector("#popupExecucao .modal-body")
+<%- contentFor("styles") %>
 
 
-            let modal = new bootstrap.Modal(document.getElementById('popupExecucao'));
-            modal.show();
+    <style>
+        #btnPararTransmissao {
+            color: #fff;
+            background-color: #a80532;
+            border-color: #a80532;
         }
 
-        function loginMotorista() {
-            let apelidoVan = document.getElementById("inputApelidoVan").value;
-            let senhaVan = document.getElementById("inputSenhaVan").value;
-            let confirmaSenhaVan = document.getElementById("inputConfirmaSenhaVan").value;
-            let placaVan = document.getElementById("inputPlacaVan").value.trim().toUpperCase();
+        .cssTituloModal {
+            width: 100%;
+            text-align: center;
+            font-size: 1.7rem !important;
 
-            if (!apelidoVan) {
-                alert("O Apelido da van é invalido !")
-                return;
-            }
-            if (!senhaVan) {
-                alert("A senha não pode estar vazia!")
-                return;
-            }
-            if (!confirmaSenhaVan) {
-                alert("A confirmação da senha não pode estar vazia!")
-                return;
-            }
-            if (senhaVan != confirmaSenhaVan) {
-                alert("Ops! As senhas não coincidem.")
-                return;
-            }
-            if (!placaVan) {
-                alert("O campo placa esta vazio.")
-                return;
-            }
+        }
+    </style>
 
-            JsonWebApi.post("<%- root %>/api/van/loginMotorista", {
-                apelido: apelidoVan,
-                senha: senhaVan,
-                placa: placaVan
-            }, function (response) {
+    <%- contentFor("scripts") %>
+        <script>
+            let intervaloGPS = null;
+            let modalJaMostrado = false;
+            let modalInstance = null;
 
-                if (response.success) {
+            function mostrarPopup(lat, lng) {
+                const modalEl = document.getElementById('exampleModal');
 
-                    Swal.success("Van encontrada!");
-                    let idVan = response.value.value.id
-                    iniciarLocalizacao(idVan)
-                } else {
-
-                    Swal.error("Van não encontrada!");
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalEl);
                 }
 
-            });
-        }
+                if (!modalJaMostrado) {
+                    modalInstance.show();
+                    modalJaMostrado = true;
+                }
+            }
 
-        let intervaloGPS = null;
+            function iniciarLocalizacao(idVan) {
+                if (intervaloGPS) return;
 
-        function iniciarLocalizacao(idVan) {
+                function capturar() {
+                    navigator.geolocation.getCurrentPosition(function (pos) {
+                        let lat = pos.coords.latitude;
+                        let lng = pos.coords.longitude;
 
-            if (intervaloGPS) return; // evita múltiplos loops
+                        JsonWebApi.post("<%- root %>/api/van/salvarLoc", {
+                            idVan: idVan,
+                            latitude: lat,
+                            longitude: lng,
+                        }, function (response) {
 
-            function capturar() {
-                navigator.geolocation.getCurrentPosition(function (pos) {
+                            if (response.success) {
+                                console.log("Salvo!");
+                            } else {
+                                console.log("Erro!");
+                            }
 
-                    let latitude = pos.coords.latitude;
-                    let longitude = pos.coords.longitude;
+                            console.log("Van:", idVan, lat, lng);
+                            mostrarPopup(lat, lng);
 
-                    console.log(idVan)
-                    console.log(latitude)
-                    console.log(longitude)
+                        });
 
-                    mostrarPopup(latitude, longitude);
+                    }, function (erro) {
+                        console.log("Erro ao obter localização:", erro);
+                    });
+                }
 
-                }, function (erro) {
-                    console.log("Erro ao obter localização:", erro);
+
+                capturar();
+                intervaloGPS = setInterval(capturar, 10000);
+            }
+
+            function pararLocalizacao() {
+                if (intervaloGPS) {
+                    clearInterval(intervaloGPS);
+                    intervaloGPS = null;
+                    console.log("Localização parada");
+                }
+
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                modalJaMostrado = false;
+            }
+
+            function loginMotorista() {
+                let apelidoVan = document.getElementById("inputApelidoVan").value;
+                let senhaVan = document.getElementById("inputSenhaVan").value;
+                let confirmaSenhaVan = document.getElementById("inputConfirmaSenhaVan").value;
+                let placaVan = document.getElementById("inputPlacaVan").value.trim().toUpperCase();
+
+                if (!apelidoVan) {
+                    alert("O Apelido da van é invalido !");
+                    return;
+                }
+                if (!senhaVan) {
+                    alert("A senha não pode estar vazia!");
+                    return;
+                }
+                if (!confirmaSenhaVan) {
+                    alert("A confirmação da senha não pode estar vazia!");
+                    return;
+                }
+                if (senhaVan != confirmaSenhaVan) {
+                    alert("Ops! As senhas não coincidem.");
+                    return;
+                }
+                if (!placaVan) {
+                    alert("O campo placa está vazio.");
+                    return;
+                }
+
+                JsonWebApi.post("<%- root %>/api/van/loginMotorista", {
+                    apelido: apelidoVan,
+                    senha: senhaVan,
+                    placa: placaVan
+                }, function (response) {
+
+                    if (response.success) {
+
+                        let idVan = response.value.value.id;
+
+                        console.log("Login OK - Van:", idVan);
+
+                        iniciarLocalizacao(idVan);
+
+                    } else {
+                        alert("Van não encontrada!");
+                    }
+
                 });
             }
 
-            capturar();
-            intervaloGPS = setInterval(capturar, 10000);
-        }
-
-        function pararLocalizacao() {
-            if (intervaloGPS) {
-                clearInterval(intervaloGPS);
-                intervaloGPS = null;
-                console.log("Localização parada");
-            }
-
-            let modalEl = document.getElementById('popupExecucao');
-            let modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) {
-                modal.hide();
-            }
-        }
-
-
-    </script>
+        </script>
