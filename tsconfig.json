@@ -5,6 +5,7 @@
 		"lib": ["ES2017", "DOM"],
 		"outDir": "src",
 		"sourceMap": true,
+		"strict": false,
 		"experimentalDecorators": true
 	},
 	"exclude": [

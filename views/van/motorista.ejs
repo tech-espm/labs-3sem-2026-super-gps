@@ -1,12 +1,12 @@
-<div class="row">
-    <div class="col-lg-12">
+<div class="row justify-content-center">
+    <div class="col-lg-6">
         <div class="p-5">
             <div class="mb-4 text-center">
                 <img style="width: 100%; max-width: 250px;" alt="Logo ESPM" src="<%- staticRoot %>/img/logo.png" />
             </div>
 
             <div>
-                <p style="text-align: center; color: #a80532;">
+                <p style="text-align: center; color: var(--primary);">
                     Olá, motorista! Faça login com sua van antes de começar a rodar.
                 </p>
             </div>
@@ -25,12 +25,8 @@
                 </div>
 
                 <div class="form-group row">
-                    <div class="col-sm-6 mb-3">
+                    <div class="col-sm-12 mb-3">
                         <input type="password" class="form-control" id="inputSenhaVan" placeholder="Senha">
-                    </div>
-                    <div class="col-sm-6">
-                        <input type="password" class="form-control" id="inputConfirmaSenhaVan"
-                            placeholder="Repetir Senha">
                     </div>
                 </div>
 
@@ -38,12 +34,6 @@
                     Rodar com a Van
                 </button>
             </form>
-
-            <hr />
-
-            <div class="text-center">
-                <a class="small" href="<%- root %>/exemplo/esqueci">Esqueceu a Senha?</a>
-            </div>
         </div>
     </div>
 </div>
@@ -53,12 +43,21 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">
 
+			<!--
             <div class="modal-header border-bottom-0">
                 <h1 class="modal-title fs-5 w-100">Localização Ativa!</h1>
             </div>
+			-->
 
-            <div class="modal-body">
-                <p id="textoLocalizacao">Sua localização está sendo compartilhada</p>
+            <div class="modal-body text-center">
+				<div class="mb-3">
+					<!--
+						https://lottiefiles.com/free-animation/travel-is-fun-IYcVDUVlkE
+					-->
+					<lottie-player src="<%- staticRoot %>/img/travel_is_fun.json" background="transparent" speed="1" style="width: 100%; max-width: 250px; margin: 0 auto; pointer-events: none;" loop autoplay></lottie-player>
+				</div>
+                <p id="textoLatLng"></p>
+                <p class="mb-0" id="textoMensagem"></p>
             </div>
 
             <div class="modal-footer justify-content-center border-top-0">
@@ -90,28 +89,36 @@
         }
     </style>
 
+	<script src="<%- staticRoot %>/lib/lottie-player-2.0.12/lottie-player.js"></script>
+
     <%- contentFor("scripts") %>
         <script>
             let intervaloGPS = null;
             let modalJaMostrado = false;
             let modalInstance = null;
 
-            function mostrarPopup(lat, lng) {
+            function mostrarPopup(lat, lng, mensagem) {
                 const modalEl = document.getElementById('exampleModal');
 
                 if (!modalInstance) {
-                    modalInstance = new bootstrap.Modal(modalEl);
+                    modalInstance = new bootstrap.Modal(modalEl, {
+						backdrop: "static",
+						keyboard: false,
+					});
                 }
 
                 if (!modalJaMostrado) {
                     modalInstance.show();
                     modalJaMostrado = true;
                 }
+
+				if (lat || lng)
+                	document.getElementById("textoLatLng").textContent = `Localização atual: ${lat} / ${lng}`;
+
+				document.getElementById("textoMensagem").textContent = mensagem;
             }
 
             function iniciarLocalizacao(idVan) {
-                if (intervaloGPS) return;
-
                 function capturar() {
                     navigator.geolocation.getCurrentPosition(function (pos) {
                         let lat = pos.coords.latitude;
@@ -121,32 +128,36 @@
                             idVan: idVan,
                             latitude: lat,
                             longitude: lng,
+							apelido: document.getElementById("inputApelidoVan").value,
+							senha: document.getElementById("inputSenhaVan").value,
                         }, function (response) {
 
-                            if (response.success) {
-                                console.log("Salvo!");
+							Swal.close();
+
+							if (response.success) {
+								mostrarPopup(lat, lng, "Localização compartilhada com sucesso: " + (new Date()).toLocaleTimeString());
                             } else {
-                                console.log("Erro!");
+								mostrarPopup(lat, lng, "Erro ao registrar a localização: " + response.value);
                             }
 
-                            console.log("Van:", idVan, lat, lng);
-                            mostrarPopup(lat, lng);
-
+							intervaloGPS = setTimeout(capturar, 10000);
                         });
 
                     }, function (erro) {
-                        console.log("Erro ao obter localização:", erro);
+						Swal.close();
+
+						mostrarPopup(null, null, "Erro ao obter localização: " + ((erro && erro.message) || erro || "Erro desconhecido"));
+
+						intervaloGPS = setTimeout(capturar, 10000);
                     });
                 }
 
-
                 capturar();
-                intervaloGPS = setInterval(capturar, 10000);
             }
 
             function pararLocalizacao() {
                 if (intervaloGPS) {
-                    clearInterval(intervaloGPS);
+                    clearTimeout(intervaloGPS);
                     intervaloGPS = null;
                     console.log("Localização parada");
                 }
@@ -161,31 +172,24 @@
             function loginMotorista() {
                 let apelidoVan = document.getElementById("inputApelidoVan").value;
                 let senhaVan = document.getElementById("inputSenhaVan").value;
-                let confirmaSenhaVan = document.getElementById("inputConfirmaSenhaVan").value;
                 let placaVan = document.getElementById("inputPlacaVan").value.trim().toUpperCase();
 
                 if (!apelidoVan) {
-                    alert("O Apelido da van é invalido !");
+                    Swal.error("O Apelido da van é invalido !");
                     return;
                 }
                 if (!senhaVan) {
-                    alert("A senha não pode estar vazia!");
-                    return;
-                }
-                if (!confirmaSenhaVan) {
-                    alert("A confirmação da senha não pode estar vazia!");
-                    return;
-                }
-                if (senhaVan != confirmaSenhaVan) {
-                    alert("Ops! As senhas não coincidem.");
+                    Swal.error("A senha não pode estar vazia!");
                     return;
                 }
                 if (!placaVan) {
-                    alert("O campo placa está vazio.");
+                    Swal.error("O campo placa está vazio.");
                     return;
                 }
 
-                JsonWebApi.post("<%- root %>/api/van/loginMotorista", {
+				Swal.wait();
+
+				JsonWebApi.post("<%- root %>/api/van/loginMotorista", {
                     apelido: apelidoVan,
                     senha: senhaVan,
                     placa: placaVan
@@ -200,7 +204,7 @@
                         iniciarLocalizacao(idVan);
 
                     } else {
-                        alert("Van não encontrada!");
+                        Swal.error("Erro ao iniciar: " + response.value);
                     }
 
                 });
