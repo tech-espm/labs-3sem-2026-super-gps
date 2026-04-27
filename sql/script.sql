@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS supergps DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_0900_ai_ci
+CREATE DATABASE IF NOT EXISTS supergps DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_0900_ai_ci;
 
 use supergps;
 
@@ -52,7 +52,6 @@ CREATE TABLE log (
   idvan int NOT NULL,
   latitude float NOT NULL,
   longitude float NOT NULL,
-  velocidade float NOT NULL,
   data datetime NOT NULL,
   PRIMARY KEY (id),
   KEY log_idvan_FK_IX (idvan ASC, data DESC),
