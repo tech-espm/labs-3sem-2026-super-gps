@@ -1,5 +1,6 @@
 import app = require("teem");
 import DataUtil = require("../utils/dataUtil");
+import { promises } from "fs";
 
 interface Van {
 	id: number;
@@ -149,6 +150,19 @@ class Van {
 
 		return null;
 	});
+}
+
+	public static async verificarVan(apelido: string, senha: string, placa: string): Promise<any> {
+	return app.sql.connect(async (sql) => {
+		const resultado = await sql.query(
+			"SELECT * FROM VAN WHERE apelido = ? AND senha = ? AND placa = ? LIMIT 1",
+			[apelido, senha, placa]
+		);
+		return resultado;
+	});
+	
+
+
 }}
 
 
