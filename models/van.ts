@@ -152,13 +152,13 @@ class Van {
 	});
 }
 
-	public static async verificarVan(apelido: string, senha: string, placa: string): Promise<any> {
+	public static async verificarVan(apelido: string, senha: string, placa: string): Promise<Van> {
 	return app.sql.connect(async (sql) => {
-		const resultado = await sql.query(
-			"SELECT * FROM VAN WHERE apelido = ? AND senha = ? AND placa = ? LIMIT 1",
+		const resultado: any[] = await sql.query(
+			"SELECT * FROM van WHERE apelido = ? AND senha = ? AND placa = ? LIMIT 1",
 			[apelido, senha, placa]
 		);
-		return resultado;
+		return (resultado && resultado.length ? resultado[0] : null);
 	});
 	
 
