@@ -64,6 +64,7 @@ class IndexRoute {
 			await Usuario.efetuarLogout(u, res);
 		res.redirect(app.root + "/");
 	}
+	
 }
 
 export = IndexRoute;
