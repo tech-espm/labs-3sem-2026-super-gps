@@ -10,6 +10,18 @@ class IndexRoute {
 		else
 			res.render("index/index", {
 				layout: "layout-sem-form",
+				titulo: "Home",
+				usuario: u
+			});
+	}
+
+	public static async dashboard(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u)
+			res.redirect(app.root + "/login");
+		else
+			res.render("index/dashboard", {
+				layout: "layout-sem-form",
 				titulo: "Dashboard",
 				usuario: u
 			});
