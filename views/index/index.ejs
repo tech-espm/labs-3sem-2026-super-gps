@@ -1,28 +1,133 @@
-<div>
-    <h3>Nosso Projeto</h3>
+<style>
+    .foto-integrante {
+        width: 75%;
+        max-width: 280px;
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        object-position: center;
+    }
+</style>
 
-    <p>Fomos convidados a desenvolver um sistema de monitoramento de vans
-        em tempo real para a ESPM, com o intuito de facilitar a localização das Vans entre as estaçoes e as
-        unidades da faculdade, para isso utilizamos como principal ferramenta...</p>
+<div class="container">
 
-    <div id="ferramentas-utilizadas">
-        <h6>bla bla</h6>
-    </div>
+    <!-- NOSSO PROJETO -->
+    <section class="px-4 py-5">
+        <h2 class="pb-2 border-bottom">Nosso Projeto</h2>
 
-</div>
+        <div class="row align-items-center g-4 py-4">
 
-<div>
-    <h3>Integrantes</h3>
-    <p>Ao longo do desenvolvimento do projeto contamos com a ajuda de alguns estudantes e suas especializações</p>
+            <div class="col-12 col-lg-6">
+                <p class="lead mb-0">
+                    Este projeto consiste em um sistema de monitoramento de vans em tempo real para a ESPM, com o
+                    objetivo de facilitar a localização dos veículos entre as estações de transporte público e as
+                    unidades da faculdade. Além do acompanhamento das rotas, o projeto também envolve a coleta e a
+                    análise dos dados gerados, contribuindo para a melhoria da logística e da
+                    experiência dos usuários.
+                </p>
+            </div>
 
-    <div id="Integrantes">
+            <div class="col-12 col-lg-6">
+                <img class="img-fluid rounded w-100" src="<%- staticRoot %>/img/vans-1.jpeg" alt="Van da ESPM">
+            </div>
 
-    </div>
+        </div>
+    </section>
 
-</div>
 
-<div>
-    <h3>Agradecimentos</h3>
-    <p> nós gostariamos de agradecer a mentoria e o auxilio do professor Carlos Rafael, que serviu como principal
-        orientador ao longo do desenvolvimento do projeto</p>
+    <!-- INTEGRANTES -->
+    <section class="px-4 py-5">
+        <h2 class="pb-2 border-bottom">Integrantes</h2>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 py-5">
+
+            <!-- RAFAEL -->
+            <div class="col">
+                <div class="h-100 d-flex flex-column">
+
+                    <img class="foto-integrante img-fluid rounded-circle d-block mx-auto mb-3"
+                        src="<%- staticRoot %>/img/rafarofas-1.jpeg" alt="Rafael Nascimento">
+
+                    <h3 class="fs-2 text-body-emphasis">
+                        Rafael Nascimento
+                    </h3>
+
+                    <p>
+                        Desenvolvedor Full Stack responsável pelo desenvolvimento completo do sistema de monitoramento
+                        das vans, trabalhando tanto na parte visual quanto na implementação dos recursos necessários
+                        para seu funcionamento.
+
+                    </p>
+
+                    <a href="https://www.linkedin.com/in/rafael-nasci/" class="icon-link mt-auto">
+                        LinkedIn
+                    </a>
+
+                </div>
+            </div>
+
+
+            <!-- PEDRO -->
+            <div class="col">
+                <div class="h-100 d-flex flex-column">
+
+                    <img class="foto-integrante img-fluid rounded-circle d-block mx-auto mb-3"
+                        src="<%- staticRoot %>/img/veiga.jpeg" alt="Pedro Veiga">
+
+                    <h3 class="fs-2 text-body-emphasis">
+                        Pedro Veiga
+                    </h3>
+
+                    <p>
+                        Analista de Dados responsável por estudar as informações geradas pelo sistema de monitoramento
+                        das vans, criando análises que ajudam a compreender melhor o funcionamento do projeto.
+                    </p>
+
+                    <a href="https://www.linkedin.com/in/pedro-veiga-7b91a0357/" class="icon-link mt-auto">
+                        LinkedIn
+                    </a>
+
+                </div>
+            </div>
+
+
+            <!-- GUSTAVO -->
+            <div class="col">
+                <div class="h-100 d-flex flex-column">
+
+                    <img class="foto-integrante img-fluid rounded-circle d-block mx-auto mb-3"
+                        src="<%- staticRoot %>/img/bulaxa.jpeg" alt="Gustavo Santana">
+
+                    <h3 class="fs-2 text-body-emphasis">
+                        Gustavo Santana
+                    </h3>
+
+                    <p>
+                        Integrante da equipe responsável por colaborar no desenvolvimento, na realização de testes e no aperfeiçoamento contínuo do sistema, contribuindo para seu bom funcionamento e para a qualidade das funcionalidades oferecidas.
+
+                    </p>
+
+                    <a href="https://www.linkedin.com/in/gustavosantana01/" class="icon-link mt-auto">
+                        LinkedIn
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- AGRADECIMENTOS -->
+    <section class="px-4 py-5">
+        <h2 class="pb-2 border-bottom">Agradecimentos</h2>
+
+        <p class="lead py-3">
+            Gostaríamos de agradecer pela mentoria e pelo apoio do professor Carlos Rafael, que atuou como principal
+            orientador durante todo o desenvolvimento deste projeto acadêmico, realizado no âmbito do Laboratório de
+            Programação. Sua orientação foi fundamental para a aplicação dos conhecimentos adquiridos em aula e para a
+            conclusão do projeto.
+
+        </p>
+    </section>
+
 </div>

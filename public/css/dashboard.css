@@ -1,0 +1,64 @@
+.dashboard-kpi {
+        border-left-width: .25rem !important;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .dashboard-kpi:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .12) !important;
+    }
+
+    .kpi-primary { border-left-color: #4e73df !important; }
+    .kpi-success { border-left-color: #1cc88a !important; }
+    .kpi-warning { border-left-color: #f6c23e !important; }
+    .kpi-danger  { border-left-color: #e74a3b !important; }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        min-height: 320px;
+    }
+
+    .chart-container.chart-small {
+        min-height: 280px;
+    }
+
+    .filtro-dashboard label {
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #5a5c69;
+        margin-bottom: .35rem;
+    }
+
+    .card-header-dashboard {
+        font-weight: 700;
+        color: #5a5c69;
+        background: #fff;
+    }
+
+    .tabela-dashboard th {
+        white-space: nowrap;
+        font-size: .8rem;
+        text-transform: uppercase;
+    }
+
+    .tabela-dashboard td {
+        vertical-align: middle;
+    }
+
+    .badge-status {
+        min-width: 92px;
+        padding: .45rem .6rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .chart-container,
+        .chart-container.chart-small {
+            min-height: 260px;
+        }
+
+        .display-dashboard {
+            font-size: 1.75rem;
+        }
+    }

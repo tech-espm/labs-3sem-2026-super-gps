@@ -10,7 +10,7 @@ class IndexRoute {
 		else
 			res.render("index/index", {
 				layout: "layout-sem-form",
-				titulo: "Home",
+				titulo: "Super GPS",
 				usuario: u
 			});
 	}
@@ -22,7 +22,7 @@ class IndexRoute {
 		else
 			res.render("index/dashboard", {
 				layout: "layout-sem-form",
-				titulo: "Dashboard",
+				titulo: "Dashboard Operacional",
 				usuario: u
 			});
 	}
