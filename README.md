@@ -40,7 +40,6 @@ Principais objetivos:
 Para executar o projeto localmente, é necessário ter instalado:
 
 - Node.js;
-- npm;
 - MySQL.
 
 Após clonar o repositório, instale as dependências do projeto:
@@ -57,7 +56,7 @@ tsc
 
 Depois, execute a aplicação.
 
-Com o projeto em execução, acesse a aplicação pelo navegador utilizando o endereço local configurado, geralmente:
+Com o projeto em execução, acesse a aplicação pelo navegador utilizando o endereço local configurado:
 
 http://localhost:3000
 
